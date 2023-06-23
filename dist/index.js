@@ -19,55 +19,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Queue = exports.pool = void 0;
-const workerpool_1 = __importDefault(require("workerpool"));
-const redis_1 = require("redis");
-const crypto_1 = __importDefault(require("crypto"));
 const cluster_1 = __importDefault(require("cluster"));
 const dayjs_1 = __importDefault(require("dayjs"));
-const queues = [];
-/** Load Redis */
-const redisClient = (0, redis_1.createClient)({
-    url: process.env.REDIS_URL,
-});
-redisClient.on("error", (err) => {
-    console.log("[Redis] - error: ", err);
-});
-redisClient.connect();
-/**
- * Add Queues Mechanism (Workerpool)
- */
-exports.pool = workerpool_1.default.pool({
-    maxWorkers: require("os").cpus().length,
-});
-class Queue {
-    constructor(name, process) {
-        this.name = name;
-        this.process = process;
-        // add this to the queues array
-        queues[name] = this;
-    }
-    add(args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            redisClient.set(`jobs:${this.name}:${crypto_1.default.randomUUID()}`, JSON.stringify({ status: "pending", args: args }));
-        });
-    }
-}
-exports.Queue = Queue;
+const redisClient_1 = require("@/utils/redisClient");
+const queue_1 = require("./queue");
 /** Jobs Worker */
 // run the jobs worker only on the first cluster worker (to avoid multiple workers doing same jobs)
 if (cluster_1.default.worker.id === 1) {
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         // search for new jobs
-        Object.entries(queues).map(([key, queue]) => __awaiter(void 0, void 0, void 0, function* () {
+        Object.entries(queue_1.availableQueues).map(([key, queue]) => __awaiter(void 0, void 0, void 0, function* () {
             var _a, e_1, _b, _c;
             try {
-                for (var _d = true, _e = __asyncValues(redisClient.scanIterator({ MATCH: `jobs:${queue.name}:*`, COUNT: 1000 })), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
+                for (var _d = true, _e = __asyncValues(redisClient_1.redisClient.scanIterator({ MATCH: `jobs:${queue.name}:*`, COUNT: 1000 })), _f; _f = yield _e.next(), _a = _f.done, !_a; _d = true) {
                     _c = _f.value;
                     _d = false;
                     const key = _c;
                     try {
-                        const cache = yield redisClient.get(key);
+                        const cache = yield redisClient_1.redisClient.get(key);
                         // check if cache is not null
                         if (!cache) {
                             continue;
@@ -75,24 +44,25 @@ if (cluster_1.default.worker.id === 1) {
                         // parse the job data
                         const jobData = JSON.parse(cache);
                         // retry staled jobs
-                        if (jobData.status === "running" && (0, dayjs_1.default)(jobData.startDate) < (0, dayjs_1.default)().subtract(5, "minutes")) {
+                        if (jobData.status === "running" &&
+                            (0, dayjs_1.default)(jobData.startDate) < (0, dayjs_1.default)().subtract(queue.retryInMinutes, "minutes")) {
                             console.log(`The job [${key}] is staled, retrying...`);
-                            redisClient.set(key, JSON.stringify(Object.assign(Object.assign({}, jobData), { status: "pending" })));
+                            redisClient_1.redisClient.set(key, JSON.stringify(Object.assign(Object.assign({}, jobData), { status: "pending" })));
                         }
                         // check if the job is already running
                         if (jobData.status === "running") {
                             continue;
                         }
                         // set the job status to running
-                        redisClient.set(key, JSON.stringify(Object.assign(Object.assign({}, jobData), { status: "running", startDate: (0, dayjs_1.default)() })));
-                        exports.pool.exec(queue.process, [...jobData.args]).then(() => {
+                        redisClient_1.redisClient.set(key, JSON.stringify(Object.assign(Object.assign({}, jobData), { status: "running", startDate: (0, dayjs_1.default)() })));
+                        queue_1.queuesPool.exec(queue.process, [...jobData.args]).then(() => {
                             console.log(`The job [${key}] is done, removing key...`);
-                            redisClient.del(key);
+                            redisClient_1.redisClient.del(key);
                         });
                     }
                     catch (err) {
                         console.log(`An error occured while processing the job [${key}]...`, err);
-                        redisClient.del(key);
+                        redisClient_1.redisClient.del(key);
                     }
                 }
             }
