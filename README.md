@@ -20,7 +20,7 @@ This library allows for persistence so that these jobs are not lost and can be r
 
 ## Install
 
-Install via yarn:
+Install via yarn
 
 ```
 yarn add workerpool-redis
@@ -62,25 +62,33 @@ const testingQueue = new Queue("testing", (foo, arg2) => {
 
 ## Add a job to your queue
 
-Add a job:
+Add a job
 
 ```ts
 testingQueue.add(["bar", "EDF-ARGUMENT2"]);
 ```
 
-### async
+## onComplete
 
-If you want to wait for the result from the job:
-
-```ts
-const result = await test.add(["ABC-ARGUMENT1", "EDF-ARGUMENT2"]);
-```
-
-If you want to intercept the result:
+Trigger a function when the job is complete
 
 ```ts
-test.add(["ABC-ARGUMENT1", "EDF-ARGUMENT2"]).then((result) => {
-  // do something with the result
-  console.log(result);
-});
+import { Queue } from "workerpool-redis";
+
+const onComplete = (result) => {
+  // do something with the results..
+  console.log(result); // will output "ghostlexly"
+};
+
+const testingQueue = new Queue(
+  "testing",
+  () => {
+    // your code goes here
+    return "ghostlexly";
+  },
+  {
+    retryInMinutes: 1, // retry this job in 1 minute if the job is still not completed
+    onComplete: onComplete,
+  }
+);
 ```

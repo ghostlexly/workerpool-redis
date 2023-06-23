@@ -13,16 +13,19 @@ const queuesPool = workerpool.pool({
 
 class Queue {
   name: string;
-  process: (...args: any[]) => Promise<void>;
+  process: (...args: any[]) => any;
+  onComplete?: (result: any) => any;
   retryInMinutes?: number = 5;
 
-  constructor(name: string, process: any, retryInMinutes?: number) {
+  constructor(
+    name: string,
+    process: (...args: any[]) => any,
+    { onComplete, retryInMinutes }: { onComplete?: (result: any) => any; retryInMinutes?: number } = {}
+  ) {
     this.name = name;
     this.process = process;
-
-    if (retryInMinutes) {
-      this.retryInMinutes = retryInMinutes;
-    }
+    this.onComplete = onComplete;
+    this.retryInMinutes = retryInMinutes;
 
     // add this to the available queues array
     availableQueues[name] = this;

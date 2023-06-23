@@ -6,9 +6,13 @@ declare const availableQueues: Queue[];
 declare const queuesPool: workerpool.WorkerPool;
 declare class Queue {
     name: string;
-    process: (...args: any[]) => Promise<void>;
+    process: (...args: any[]) => any;
+    onComplete?: (result: any) => any;
     retryInMinutes?: number;
-    constructor(name: string, process: any, retryInMinutes?: number);
+    constructor(name: string, process: (...args: any[]) => any, { onComplete, retryInMinutes }?: {
+        onComplete?: (result: any) => any;
+        retryInMinutes?: number;
+    });
     add(args: [] | any[]): Promise<void>;
 }
 export { Queue, queuesPool, availableQueues };

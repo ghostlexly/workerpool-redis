@@ -26,13 +26,12 @@ const queuesPool = workerpool_1.default.pool({
 });
 exports.queuesPool = queuesPool;
 class Queue {
-    constructor(name, process, retryInMinutes) {
+    constructor(name, process, { onComplete, retryInMinutes } = {}) {
         this.retryInMinutes = 5;
         this.name = name;
         this.process = process;
-        if (retryInMinutes) {
-            this.retryInMinutes = retryInMinutes;
-        }
+        this.onComplete = onComplete;
+        this.retryInMinutes = retryInMinutes;
         // add this to the available queues array
         availableQueues[name] = this;
     }

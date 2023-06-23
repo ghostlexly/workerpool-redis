@@ -38,9 +38,14 @@ if (cluster.worker.id === 1) {
           // set the job status to running
           redisClient.set(key, JSON.stringify({ ...jobData, status: "running", startDate: dayjs() }));
 
-          queuesPool.exec(queue.process, [...jobData.args]).then(() => {
+          queuesPool.exec(queue.process, [...jobData.args]).then((result) => {
             console.log(`The job [${key}] is done, removing key...`);
             redisClient.del(key);
+
+            // call the onComplete callback
+            if (queue.onComplete) {
+              queue.onComplete(result);
+            }
           });
         } catch (err) {
           console.log(`An error occured while processing the job [${key}]...`, err);
