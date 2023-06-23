@@ -1,7 +1,7 @@
 import { createClient } from "redis";
 
 /** Load Redis */
-export const redisClient = createClient({
+const redisClient = createClient({
   url: process.env.REDIS_URL,
 });
 
@@ -10,3 +10,5 @@ redisClient.on("error", (err) => {
 });
 
 redisClient.connect();
+
+export { redisClient };

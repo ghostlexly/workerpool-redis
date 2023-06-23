@@ -2,16 +2,16 @@ import workerpool from "workerpool";
 import { redisClient } from "./utils/redisClient";
 import crypto from "crypto";
 
-export const availableQueues: Queue[] = [];
+const availableQueues: Queue[] = [];
 
 /**
  * Add Queues Mechanism (Workerpool)
  */
-export const queuesPool = workerpool.pool({
+const queuesPool = workerpool.pool({
   maxWorkers: require("os").cpus().length,
 });
 
-export class Queue {
+class Queue {
   name: string;
   process: (...args: any[]) => Promise<void>;
   retryInMinutes?: number = 5;
@@ -32,3 +32,5 @@ export class Queue {
     redisClient.set(`jobs:${this.name}:${crypto.randomUUID()}`, JSON.stringify({ status: "pending", args: args }));
   }
 }
+
+export { Queue, queuesPool, availableQueues };

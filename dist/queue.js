@@ -12,17 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Queue = exports.queuesPool = exports.availableQueues = void 0;
+exports.availableQueues = exports.queuesPool = exports.Queue = void 0;
 const workerpool_1 = __importDefault(require("workerpool"));
 const redisClient_1 = require("./utils/redisClient");
 const crypto_1 = __importDefault(require("crypto"));
-exports.availableQueues = [];
+const availableQueues = [];
+exports.availableQueues = availableQueues;
 /**
  * Add Queues Mechanism (Workerpool)
  */
-exports.queuesPool = workerpool_1.default.pool({
+const queuesPool = workerpool_1.default.pool({
     maxWorkers: require("os").cpus().length,
 });
+exports.queuesPool = queuesPool;
 class Queue {
     constructor(name, process, retryInMinutes) {
         this.retryInMinutes = 5;
@@ -32,7 +34,7 @@ class Queue {
             this.retryInMinutes = retryInMinutes;
         }
         // add this to the available queues array
-        exports.availableQueues[name] = this;
+        availableQueues[name] = this;
     }
     add(args) {
         return __awaiter(this, void 0, void 0, function* () {
