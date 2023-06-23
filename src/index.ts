@@ -1,7 +1,7 @@
 import cluster from "cluster";
 import dayjs from "dayjs";
-import { redisClient } from "@/utils/redisClient";
-import { availableQueues, queuesPool } from "./queue";
+import { redisClient } from "./utils/redisClient";
+import { availableQueues, queuesPool, Queue } from "./queue";
 
 /** Jobs Worker */
 // run the jobs worker only on the first cluster worker (to avoid multiple workers doing same jobs)
@@ -50,3 +50,5 @@ if (cluster.worker.id === 1) {
     });
   }, 500);
 }
+
+export { Queue, queuesPool, availableQueues, redisClient };

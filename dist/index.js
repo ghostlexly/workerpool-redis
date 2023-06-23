@@ -19,10 +19,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.redisClient = exports.availableQueues = exports.queuesPool = exports.Queue = void 0;
 const cluster_1 = __importDefault(require("cluster"));
 const dayjs_1 = __importDefault(require("dayjs"));
-const redisClient_1 = require("@/utils/redisClient");
+const redisClient_1 = require("./utils/redisClient");
+Object.defineProperty(exports, "redisClient", { enumerable: true, get: function () { return redisClient_1.redisClient; } });
 const queue_1 = require("./queue");
+Object.defineProperty(exports, "availableQueues", { enumerable: true, get: function () { return queue_1.availableQueues; } });
+Object.defineProperty(exports, "queuesPool", { enumerable: true, get: function () { return queue_1.queuesPool; } });
+Object.defineProperty(exports, "Queue", { enumerable: true, get: function () { return queue_1.Queue; } });
 /** Jobs Worker */
 // run the jobs worker only on the first cluster worker (to avoid multiple workers doing same jobs)
 if (cluster_1.default.worker.id === 1) {

@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Queue = exports.queuesPool = exports.availableQueues = void 0;
 const workerpool_1 = __importDefault(require("workerpool"));
-const redisClient_1 = require("@/utils/redisClient");
+const redisClient_1 = require("./utils/redisClient");
 exports.availableQueues = [];
 /**
  * Add Queues Mechanism (Workerpool)

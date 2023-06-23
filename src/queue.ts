@@ -1,5 +1,5 @@
 import workerpool from "workerpool";
-import { redisClient } from "@/utils/redisClient";
+import { redisClient } from "./utils/redisClient";
 
 export const availableQueues: Queue[] = [];
 
