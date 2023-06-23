@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Queue = exports.queuesPool = exports.availableQueues = void 0;
 const workerpool_1 = __importDefault(require("workerpool"));
 const redisClient_1 = require("./utils/redisClient");
+const crypto_1 = __importDefault(require("crypto"));
 exports.availableQueues = [];
 /**
  * Add Queues Mechanism (Workerpool)
@@ -35,7 +36,7 @@ class Queue {
     }
     add(args) {
         return __awaiter(this, void 0, void 0, function* () {
-            redisClient_1.redisClient.set(`jobs:${this.name}:${crypto.randomUUID()}`, JSON.stringify({ status: "pending", args: args }));
+            redisClient_1.redisClient.set(`jobs:${this.name}:${crypto_1.default.randomUUID()}`, JSON.stringify({ status: "pending", args: args }));
         });
     }
 }

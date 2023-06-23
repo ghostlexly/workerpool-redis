@@ -1,5 +1,6 @@
 import workerpool from "workerpool";
 import { redisClient } from "./utils/redisClient";
+import crypto from "crypto";
 
 export const availableQueues: Queue[] = [];
 
