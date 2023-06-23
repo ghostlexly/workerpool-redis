@@ -1,0 +1,24 @@
+{
+  "name": "workerpool-redis",
+  "version": "1.0.1",
+  "description": "Workerpool on steroids with Redis. Queue persistence, automatic retry.",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "repository": "https://github.com/ghostlexly/workerpool-redis.git",
+  "author": "ghostlexly <ghostlexly@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@types/workerpool": "^6.4.0",
+    "crypto": "^1.0.1",
+    "dayjs": "^1.11.8",
+    "redis": "^4.6.7",
+    "typescript": "^5.1.3",
+    "workerpool": "^6.4.0"
+  }
+}
