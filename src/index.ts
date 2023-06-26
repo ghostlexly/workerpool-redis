@@ -5,7 +5,7 @@ import { availableQueues, queuesPool, Queue } from "./queue";
 
 /** Jobs Worker */
 // run the jobs worker only on the first cluster worker (to avoid multiple workers doing same jobs)
-if (cluster.worker.id === 1) {
+if (!cluster || !cluster.worker || cluster.worker.id === 1) {
   setInterval(async () => {
     // search for new jobs
     Object.entries(availableQueues).map(async ([key, queue]) => {

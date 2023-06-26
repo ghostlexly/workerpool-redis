@@ -30,7 +30,7 @@ Object.defineProperty(exports, "queuesPool", { enumerable: true, get: function (
 Object.defineProperty(exports, "Queue", { enumerable: true, get: function () { return queue_1.Queue; } });
 /** Jobs Worker */
 // run the jobs worker only on the first cluster worker (to avoid multiple workers doing same jobs)
-if (cluster_1.default.worker.id === 1) {
+if (!cluster_1.default || !cluster_1.default.worker || cluster_1.default.worker.id === 1) {
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
         // search for new jobs
         Object.entries(queue_1.availableQueues).map(([key, queue]) => __awaiter(void 0, void 0, void 0, function* () {
